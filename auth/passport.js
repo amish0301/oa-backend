@@ -1,39 +1,9 @@
-const passport = require("passport");
-const session = require("express-session");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const path = require("path");
-const MongoStore = require("connect-mongo");
 const User = require("../db/user.model");
-
+const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
-const initializePassport = (app) => {
-
-  // store session in mongodb
-  const mongoStore = MongoStore.create({
-    mongoUrl: process.env.MONGO_URI,
-    collectionName: "sessions",
-    ttl: 5 * 60 * 1000
-  });
-
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET,
-      resave: false,
-      saveUninitialized: false,
-      store: mongoStore,
-      cookie: {
-        maxAge: 5 * 60 * 1000, // 5 min
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
-      },
-    })
-  );
-
-  app.use(passport.initialize());
-  app.use(passport.session());
-
+const initializePassport = (passport) => {
   passport.use(
     new GoogleStrategy(
       {
@@ -53,6 +23,8 @@ const initializePassport = (app) => {
               googleId: profile.id,
               password: Date.now().toString(),
             });
+
+            await user.save();
           }
 
           done(null, user);
@@ -64,7 +36,7 @@ const initializePassport = (app) => {
   );
 
   passport.serializeUser((user, done) => {
-    console.log('serializing user', user)
+    console.log('in serialize user', user)
     done(null, user._id);
   });
 
