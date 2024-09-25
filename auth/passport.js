@@ -43,11 +43,8 @@ const passportUtil = (app) => {
               googleId: profile.id,
               password: Date.now().toString(),
             });
-
-            user.refreshToken = await user.generateRefreshToken();
-            await user.save({ validateBeforeSave: false });
           }
-
+          
           return done(null, user);
         } catch (error) {
           return done(error, null);

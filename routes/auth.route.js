@@ -14,11 +14,6 @@ require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const router = express.Router();
 
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-
 // authenticate user through google
 router.get(
   "/google/callback",
@@ -32,14 +27,17 @@ router.get("/login/success", async (req, res) => {
   try {
     if (req.isAuthenticated()) {
       const accessToken = await req.user.generateAccessToken();
-      const refreshToken = req.user.refreshToken;
+      const refreshToken = await req.user.generateRefreshToken();
+      const user = await User.findById(req.user._id).select("-password -refreshToken");
 
+      // set cookies
+      res.cookie(process.env.AUTH_TOKEN, accessToken, cookieOption);
+      res.cookie("refreshToken", refreshToken, cookieOption);
+      
       return res
         .status(200)
-        .cookie(process.env.AUTH_TOKEN, accessToken, cookieOption)
-        .cookie("refreshToken", refreshToken, cookieOption)
         .json({
-          user: req.user,
+          user,
           success: true,
           message: "Login successfully",
           refreshToken,
@@ -66,19 +64,14 @@ router.get("/login/failed", async (req, res) => {
 
 router.get("/logout", isAuthenticated, async (req, res) => {
   try {
-    req.logOut((err) => {
-      if (err) {
-        return res.status(500).json({ success: false, message: err });
-      }
-      return res
-        .status(200)
-        .clearCookie(process.env.AUTH_TOKEN)
-        .clearCookie("refreshToken")
-        .json({ success: true, message: "Logout successfully" });
-    });
-
-    // remove user from database
     await User.findByIdAndDelete(req.uId);
+    res.clearCookie(process.env.AUTH_TOKEN, cookieOption);
+    res.clearCookie("refreshToken", cookieOption);
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Logout successfully" });
+    // remove user from database
   } catch (error) {
     return res.status(500).json({ success: false, message: "Server Error" });
   }
