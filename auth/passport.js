@@ -37,13 +37,10 @@ const initializePassport = (passport) => {
 
   // Deserialize user from the session
   passport.deserializeUser(async (id, done) => {
-    console.log("Attempting to deserialize user with ID:", id);
     try {
       const user = await User.findById(id);
-      console.log("Deserialized user:", user);
       done(null, user);
     } catch (error) {
-      console.error("Deserialization error:", error);
       done(error, null);
     }
   });

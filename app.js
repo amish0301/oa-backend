@@ -38,12 +38,6 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: mongoStore,
-    cookie: {
-      maxAge: 15 * 60 * 1000, // 15 min
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
-    },
   })
 );
 

@@ -18,6 +18,7 @@ router.get(
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
+// callback from google authentication
 router.get(
   "/google/callback",
   passport.authenticate("google", {
@@ -30,7 +31,6 @@ router.get(
 
 router.get("/login/success", async (req, res) => {
   try {
-    console.log("login success req.user", req.isAuthenticated(), req.user);
     if (req.isAuthenticated()) {
       const accessToken = await req.user.generateAccessToken();
       const refreshToken = await req.user.generateRefreshToken();
@@ -50,7 +50,6 @@ router.get("/login/success", async (req, res) => {
       });
     }
   } catch (error) {
-    console.log("error from /login/success", error);
     return res
       .status(401)
       .json({ success: false, message: "Google Login Failed" });
