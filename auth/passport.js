@@ -16,7 +16,7 @@ const passportUtil = (app) => {
         maxAge: 5 * 60 * 1000, // 5 min
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",
       },
     })
   );
@@ -43,8 +43,9 @@ const passportUtil = (app) => {
               googleId: profile.id,
               password: Date.now().toString(),
             });
+            await user.save();
           }
-          
+
           return done(null, user);
         } catch (error) {
           return done(error, null);

@@ -25,23 +25,27 @@ router.get(
 
 router.get("/login/success", async (req, res) => {
   try {
+    console.log("Session:", req.session); // Log session information
+    console.log("User:", req.user); // Log user information
+    console.log("Authenticated:", req.isAuthenticated());
+    
     if (req.isAuthenticated()) {
       const accessToken = await req.user.generateAccessToken();
       const refreshToken = await req.user.generateRefreshToken();
-      const user = await User.findById(req.user._id).select("-password -refreshToken");
+      const user = await User.findById(req.user._id).select(
+        "-password -refreshToken"
+      );
 
       // set cookies
       res.cookie(process.env.AUTH_TOKEN, accessToken, cookieOption);
       res.cookie("refreshToken", refreshToken, cookieOption);
-      
-      return res
-        .status(200)
-        .json({
-          user,
-          success: true,
-          message: "Login successfully",
-          refreshToken,
-        });
+
+      return res.status(200).json({
+        user,
+        success: true,
+        message: "Login successfully",
+        refreshToken,
+      });
     } else {
       return res.status(401).json({
         success: false,
