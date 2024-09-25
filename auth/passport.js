@@ -64,6 +64,7 @@ const initializePassport = (app) => {
   );
 
   passport.serializeUser((user, done) => {
+    console.log('serializing user', user)
     done(null, user._id);
   });
 
@@ -71,6 +72,7 @@ const initializePassport = (app) => {
   passport.deserializeUser(async (id, done) => {
     try {
       const user = await User.findById(id);
+      console.log('deserializing user', user)
       done(null, user);
     } catch (error) {
       done(error, null);
