@@ -6,7 +6,7 @@ const User = require("../db/user.model");
 
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
-const passportUtil = (app) => {
+const initializePassport = (app) => {
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
@@ -69,4 +69,4 @@ const passportUtil = (app) => {
   });
 };
 
-module.exports = passportUtil;
+module.exports = initializePassport;
