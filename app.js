@@ -16,11 +16,11 @@ require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 const app = express();
 connectDB(process.env.MONGO_URI);
 
-passport(app);
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
+passport(app);
 
 // middleware for passport
 
