@@ -14,7 +14,10 @@ require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const router = express.Router();
 
-// authenticate user through google
+// send request to google
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+// get data from session
 router.get(
   "/google/callback",
   passport.authenticate("google", {
@@ -71,7 +74,6 @@ router.get("/logout", isAuthenticated, async (req, res) => {
     return res
       .status(200)
       .json({ success: true, message: "Logout successfully" });
-    // remove user from database
   } catch (error) {
     return res.status(500).json({ success: false, message: "Server Error" });
   }

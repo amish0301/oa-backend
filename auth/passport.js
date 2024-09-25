@@ -43,12 +43,11 @@ const initializePassport = (app) => {
               googleId: profile.id,
               password: Date.now().toString(),
             });
-            await user.save();
           }
 
-          return done(null, user);
+          done(null, user);
         } catch (error) {
-          return done(error, null);
+          done(error, null);
         }
       }
     )
@@ -62,9 +61,9 @@ const initializePassport = (app) => {
   passport.deserializeUser(async (id, done) => {
     try {
       const user = await User.findById(id);
-      return done(null, user);
+      done(null, user);
     } catch (error) {
-      return done(error, null);
+      done(error, null);
     }
   });
 };
