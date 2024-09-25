@@ -31,23 +31,8 @@ const generateTokens = async (user) => {
   }
 };
 
-const sendToken = async (res, statusCode, user, message) => {
-  try {
-    return res.status(statusCode).json({
-      success: true,
-      message,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
-  }
-};
-
 module.exports = {
   TryCatch,
   cookieOption,
-  sendToken,
   generateTokens,
 };
