@@ -28,10 +28,7 @@ router.get(
 
 router.get("/login/success", async (req, res) => {
   try {
-    console.log("Session Data:", req.session); // Log the session data
-    console.log("User Data:", req.user); 
     if (req.isAuthenticated()) {
-      console.log('user in login success', req.user)
       const accessToken = await req.user.generateAccessToken();
       const refreshToken = await req.user.generateRefreshToken();
       const user = await User.findById(req.user._id).select(

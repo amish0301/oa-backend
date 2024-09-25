@@ -31,7 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 const mongoStore = MongoStore.create({
   mongoUrl: process.env.MONGO_URI,
   collectionName: "sessions",
-  ttl: 5 * 60 * 1000, // 5 min
+  ttl: 15 * 60 * 1000, // 15 min
 });
 
 app.use(
@@ -41,7 +41,7 @@ app.use(
     saveUninitialized: false,
     store: mongoStore,
     cookie: {
-      maxAge: 5 * 60 * 1000, // 5 min
+      maxAge: 15 * 60 * 1000, // 15 min
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "None" : "lax",

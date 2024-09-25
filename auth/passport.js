@@ -23,8 +23,6 @@ const initializePassport = (passport) => {
               googleId: profile.id,
               password: Date.now().toString(),
             });
-
-            await user.save();
           }
 
           done(null, user);
@@ -36,7 +34,6 @@ const initializePassport = (passport) => {
   );
 
   passport.serializeUser((user, done) => {
-    console.log("in serialize user", user);
     done(null, user._id);
   });
 
@@ -44,9 +41,10 @@ const initializePassport = (passport) => {
   passport.deserializeUser(async (id, done) => {
     try {
       const user = await User.findById(id);
-      console.log("deserializing user", user);
+      console.log('user in deserialize', user);
       done(null, user);
     } catch (error) {
+      console.log('error in deserialize', error);
       done(error, null);
     }
   });
