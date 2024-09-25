@@ -36,7 +36,7 @@ const initializePassport = (passport) => {
   );
 
   passport.serializeUser((user, done) => {
-    console.log('in serialize user', user)
+    console.log("in serialize user", user);
     done(null, user._id);
   });
 
@@ -44,7 +44,7 @@ const initializePassport = (passport) => {
   passport.deserializeUser(async (id, done) => {
     try {
       const user = await User.findById(id);
-      console.log('deserializing user', user)
+      console.log("deserializing user", user);
       done(null, user);
     } catch (error) {
       done(error, null);
