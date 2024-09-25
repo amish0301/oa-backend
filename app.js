@@ -5,28 +5,26 @@ const authRoutes = require("./routes/auth.route.js");
 const userRoutes = require("./routes/user.route.js");
 const testRoutes = require("./routes/test.route.js");
 const adminRoutes = require("./routes/admin.route.js");
-const path = require("path");
 const passport = require("passport");
 const initializePassport = require("./auth/passport.js");
 const cookieParser = require("cookie-parser");
 const { ErrorHandler } = require("./middleware/ErrorHandler.js");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
+require("dotenv").config();
 
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
-
-const app = express();
 connectDB(process.env.MONGO_URI);
 
+const app = express();
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: process.env.CLIENT_URI,
     credentials: true,
   })
 );
-app.use(express.urlencoded({ extended: true }));
 
 const mongoStore = MongoStore.create({
   mongoUrl: process.env.MONGO_URI,

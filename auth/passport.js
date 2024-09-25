@@ -1,7 +1,6 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../db/user.model");
-const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+require("dotenv").config();
 
 const initializePassport = (passport) => {
   passport.use(
@@ -24,7 +23,6 @@ const initializePassport = (passport) => {
               password: Date.now().toString(),
             });
           }
-
           done(null, user);
         } catch (error) {
           done(error, null);
@@ -39,12 +37,13 @@ const initializePassport = (passport) => {
 
   // Deserialize user from the session
   passport.deserializeUser(async (id, done) => {
+    console.log("Attempting to deserialize user with ID:", id);
     try {
       const user = await User.findById(id);
-      console.log('user in deserialize', user);
+      console.log("Deserialized user:", user);
       done(null, user);
     } catch (error) {
-      console.log('error in deserialize', error);
+      console.error("Deserialization error:", error);
       done(error, null);
     }
   });

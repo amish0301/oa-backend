@@ -1,6 +1,5 @@
 const express = require("express");
 const passport = require("passport");
-const path = require("path");
 const {
   registerUser,
   loginUser,
@@ -9,25 +8,29 @@ const {
 const User = require("../db/user.model");
 const { cookieOption } = require("../utils/helper");
 const isAuthenticated = require("../middleware/isAuth");
-const ApiError = require("../utils/ApiError");
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+require("dotenv").config();
 
 const router = express.Router();
 
 // send request to google
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
 
-// get data from session
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    successRedirect: `${process.env.CLIENT_URI}/auth/login/success`,
     failureRedirect: `${process.env.CLIENT_URI}/auth/login/failed`,
-  })
+  }),
+  (req, res) => {
+    res.redirect(`${process.env.CLIENT_URI}/auth/login/success`);
+  }
 );
 
 router.get("/login/success", async (req, res) => {
   try {
+    console.log("login success req.user", req.isAuthenticated(), req.user);
     if (req.isAuthenticated()) {
       const accessToken = await req.user.generateAccessToken();
       const refreshToken = await req.user.generateRefreshToken();
@@ -45,16 +48,12 @@ router.get("/login/success", async (req, res) => {
         message: "Login successfully",
         refreshToken,
       });
-    } else {
-      return res.status(401).json({
-        success: false,
-        message: "You're Not Authenticated | Google OAuth failed",
-      });
     }
   } catch (error) {
+    console.log("error from /login/success", error);
     return res
       .status(401)
-      .json({ success: false, message: "Not authorized" });
+      .json({ success: false, message: "Google Login Failed" });
   }
 });
 
