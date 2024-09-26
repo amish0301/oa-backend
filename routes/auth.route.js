@@ -26,22 +26,21 @@ router.get(
   }),
   (req, res) => {
     console.log("OAuth Callback User:", req.user);
-    res.redirect(`/auth/login/success`);
+    res.redirect(`${process.env.CLIENT_URI}/login/success`);
   }
 );
 
 router.get("/login/success", async (req, res) => {
   try {
     if (req.isAuthenticated()) {
-      const accessToken = await req.user.generateAccessToken();
-      const refreshToken = await req.user.generateRefreshToken();
-      const user = await User.findById(req.user._id).select(
-        "-password -refreshToken"
-      );
+      console.log("User:", req.user);
+      // const accessToken = await req.user.generateAccessToken();
+      // const refreshToken = await req.user.generateRefreshToken();
+      const user = req.user
 
       // set cookies
-      res.cookie(process.env.AUTH_TOKEN, accessToken, cookieOption);
-      res.cookie("refreshToken", refreshToken, cookieOption);
+      // res.cookie(process.env.AUTH_TOKEN, accessToken, cookieOption);
+      // res.cookie("refreshToken", refreshToken, cookieOption);
 
       return res.status(200).json({
         user,
