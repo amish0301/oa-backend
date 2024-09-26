@@ -26,7 +26,7 @@ router.get(
   }),
   (req, res) => {
     console.log("OAuth Callback User:", req.user);
-    res.redirect(`${process.env.CLIENT_URI}/login/success`);
+    res.redirect(`${process.env.CLIENT_URI}/auth/login/success`);
   }
 );
 
