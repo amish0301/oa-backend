@@ -69,7 +69,13 @@ router.get("/login/failed", async (req, res) => {
 
 router.get("/logout", isAuthenticated, async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.uId);
+    const user = await User.findByIdAndDelete(req.uId);
+
+    if(!user) {
+      return res.status(401).json({ success: false, message: "User not found" });
+    }
+    
+    console.log(user);
     res.clearCookie(process.env.AUTH_TOKEN, cookieOption);
     res.clearCookie("refreshToken", cookieOption);
 
