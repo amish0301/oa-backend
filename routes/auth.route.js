@@ -22,7 +22,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: `/auth/login/failed`,
+    failureRedirect: `${process.env.CLIENT_URI}/auth/login/failed`,
   }),
   (req, res) => {
     console.log("OAuth Callback User:", req.user);
@@ -50,7 +50,6 @@ router.get("/login/success", async (req, res) => {
         user,
         success: true,
         message: "Login successfully",
-        refreshToken,
       });
     } else {
       return res.status(401).json({
