@@ -12,7 +12,6 @@ const initializePassport = (passport) => {
         scope: ["profile", "email"],
       },
       async (accessToken, refreshToken, profile, done) => {
-        console.log('Google Strategy Callback');
         try {
           let user = await User.findOne({ googleId: profile.id });
           if (!user) {
@@ -36,7 +35,7 @@ const initializePassport = (passport) => {
   );
 
   passport.serializeUser((user, done) => {
-    console.log('Serializing user:', user._id);
+    console.log('Serializing user:', user);
     done(null, user._id);
   });
 

@@ -10,7 +10,6 @@ const initializePassport = require("./auth/passport.js");
 const cookieParser = require("cookie-parser");
 const { ErrorHandler } = require("./middleware/ErrorHandler.js");
 const session = require("express-session");
-const MongoStore = require("connect-mongo");
 require("dotenv").config();
 
 const app = express();
@@ -24,30 +23,22 @@ app.use(cors({
 }))
 connectDB(process.env.MONGO_URI);
 
-const mongoStore = MongoStore.create({
-  mongoUrl: process.env.MONGO_URI,
-  collectionName: "sessions",
-  ttl: 15 * 60 * 1000, // 15 min
-});
-
 // remove cookie for development it will work
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: mongoStore,
     cookie: {
       maxAge: 15 * 60 * 1000,
       httpOnly: true,
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
-      domain: process.env.NODE_ENV === "production" ? new URL(process.env.CLIENT_URI).hostname : null,
     },
   })
 );
 
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 app.use((req, res, next) => {
   console.log('Cookies:', req.cookies);
@@ -58,19 +49,12 @@ console.log('checking comparator', process.env.NODE_ENV === "production");
 console.log("MongoDB URI:", process.env.MONGO_URI);
 console.log("client:", process.env.CLIENT_URI);
 
-mongoStore.on('create', function(sessionId) {
-  console.log('New session created: ', sessionId);
-});
-
-mongoStore.on('touch', function(sessionId) {
-  console.log('Session touched: ', sessionId);
-});
-
 app.use(passport.initialize());
 app.use(passport.session());
 
 // passport initialize
 initializePassport(passport);
+
 app.use((req, res, next) => {
   console.log('Request cookies:', req.cookies);
   console.log('Session ID:', req.sessionID);
