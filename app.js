@@ -38,7 +38,7 @@ app.use(
   })
 );
 
-app.set("trust proxy", 1);
+// app.set("trust proxy", 1); may not be needed
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -51,24 +51,6 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/test", testRoutes);
 app.use("/admin", adminRoutes);
-
-app.use((req, res, next) => {
-  console.log('Request cookies:', req.cookies);
-  console.log('Session ID:', req.sessionID);
-  console.log('Session:', req.session);
-  console.log('Is Authenticated:', req.isAuthenticated());
-  next();
-});
-
-app.get('/check-session', (req, res) => {
-  console.log('Session Data:', req.session);
-  if (req.session) {
-    res.status(200).json({ message: 'Session is initialized',
-      session: req.session, });
-  } else {
-    res.status(400).json({ message: 'No session found' });
-  }
-})
 
 app.get("/", (req, res) => {
   res.send("Hello from server");
