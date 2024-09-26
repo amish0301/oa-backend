@@ -17,12 +17,21 @@ require("dotenv").config();
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+
 app.use(cors({
   origin: process.env.CLIENT_URI,
   credentials: true
 }))
 connectDB(process.env.MONGO_URI);
+
+app.use((req, res, next) => {
+  console.log('Cookies:', req.cookies);
+  next();
+});
+
+if (!process.env.SESSION_SECRET || !process.env.CLIENT_URI || !process.env.MONGO_URI) {
+  console.error('Missing critical environment variables');
+}
 
 const mongoStore = MongoStore.create({
   mongoUrl: process.env.MONGO_URI,
@@ -30,19 +39,20 @@ const mongoStore = MongoStore.create({
   ttl: 15 * 60 * 1000, // 15 min
 });
 
+
 // remove cookie for development it will work
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: mongoStore,
     cookie: {
       maxAge: 15 * 60 * 1000,
       httpOnly: true,
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       secure: process.env.NODE_ENV === "production",
-    }
+    },
+    store: mongoStore,
   })
 );
 
