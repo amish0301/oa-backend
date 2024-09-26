@@ -40,20 +40,17 @@ app.use(
 
 app.set("trust proxy", 1);
 
-app.use((req, res, next) => {
-  console.log('Cookies:', req.cookies);
-  next();
-});
-
-console.log('checking comparator', process.env.NODE_ENV === "production");
-console.log("MongoDB URI:", process.env.MONGO_URI);
-console.log("client:", process.env.CLIENT_URI);
-
 app.use(passport.initialize());
 app.use(passport.session());
 
 // passport initialize
 initializePassport(passport);
+
+
+app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
+app.use("/test", testRoutes);
+app.use("/admin", adminRoutes);
 
 app.use((req, res, next) => {
   console.log('Request cookies:', req.cookies);
@@ -62,11 +59,6 @@ app.use((req, res, next) => {
   console.log('Is Authenticated:', req.isAuthenticated());
   next();
 });
-
-app.use("/auth", authRoutes);
-app.use("/user", userRoutes);
-app.use("/test", testRoutes);
-app.use("/admin", adminRoutes);
 
 app.get('/check-session', (req, res) => {
   console.log('Session Data:', req.session);

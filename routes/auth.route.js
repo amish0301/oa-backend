@@ -34,11 +34,7 @@ router.get("/login/success", async (req, res) => {
     if (req.isAuthenticated()) {
       const accessToken = await req.user.generateAccessToken();
       const refreshToken = await req.user.generateRefreshToken();
-      console.log("accessToken", accessToken);
-      console.log("refreshToken", refreshToken);
-
-      const user = await User.findById(req.uId).select("-password");
-      console.log(user)
+      const user = await User.findById(req.user._id).select("-password");
 
       // set cookies
       res.cookie(process.env.AUTH_TOKEN, accessToken, cookieOption);
