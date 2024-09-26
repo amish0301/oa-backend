@@ -32,6 +32,7 @@ router.get(
 
 router.get("/login/success", async (req, res) => {
   try {
+    console.log("Login Success route");
     console.log("Session data:", req.session);
     console.log("User data:", req.user);
     console.log("Is authenticated:", req.isAuthenticated());

@@ -12,6 +12,7 @@ const initializePassport = (passport) => {
         scope: ["profile", "email"],
       },
       async (accessToken, refreshToken, profile, done) => {
+        console.log('Google Strategy Callback');
         try {
           let user = await User.findOne({ googleId: profile.id });
           if (!user) {
@@ -22,6 +23,9 @@ const initializePassport = (passport) => {
               googleId: profile.id,
               password: Date.now().toString(),
             });
+            console.log('New user created:', user);
+          }else {
+            console.log('User found:', user);
           }
           done(null, user);
         } catch (error) {
@@ -32,16 +36,23 @@ const initializePassport = (passport) => {
   );
 
   passport.serializeUser((user, done) => {
+    console.log('Serializing user:', user._id);
     done(null, user._id);
   });
 
   // Deserialize user from the session
   passport.deserializeUser(async (id, done) => {
+    console.log('Deserializing user:', id);
     try {
       const user = await User.findById(id);
-      if(!user) return done(new Error("User not found"), null);
+      if(!user) {
+        console.log('User not found during deserialization');
+        return done(new Error("User not found"), null);
+      }
+      console.log('User deserialized:', user);
       done(null, user);
     } catch (error) {
+      console.error('Error during deserialization:', error);
       done(error, null);
     }
   });

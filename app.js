@@ -13,25 +13,16 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 require("dotenv").config();
 
-
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-
 app.use(cors({
   origin: process.env.CLIENT_URI,
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }))
 connectDB(process.env.MONGO_URI);
-
-app.use((req, res, next) => {
-  console.log('Cookies:', req.cookies);
-  next();
-});
-
-if (!process.env.SESSION_SECRET || !process.env.CLIENT_URI || !process.env.MONGO_URI) {
-  console.error('Missing critical environment variables');
-}
 
 const mongoStore = MongoStore.create({
   mongoUrl: process.env.MONGO_URI,
@@ -39,28 +30,54 @@ const mongoStore = MongoStore.create({
   ttl: 15 * 60 * 1000, // 15 min
 });
 
-
 // remove cookie for development it will work
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: mongoStore,
     cookie: {
       maxAge: 15 * 60 * 1000,
       httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
+      domain: process.env.NODE_ENV === "production" ? new URL(process.env.CLIENT_URI).hostname : null,
     },
-    store: mongoStore,
   })
 );
+
+app.set('trust proxy', 1);
+
+app.use((req, res, next) => {
+  console.log('Cookies:', req.cookies);
+  next();
+});
+
+console.log('checking comparator', process.env.NODE_ENV === "production");
+console.log("MongoDB URI:", process.env.MONGO_URI);
+console.log("client:", process.env.CLIENT_URI);
+
+mongoStore.on('create', function(sessionId) {
+  console.log('New session created: ', sessionId);
+});
+
+mongoStore.on('touch', function(sessionId) {
+  console.log('Session touched: ', sessionId);
+});
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 // passport initialize
 initializePassport(passport);
+app.use((req, res, next) => {
+  console.log('Request cookies:', req.cookies);
+  console.log('Session ID:', req.sessionID);
+  console.log('Session:', req.session);
+  console.log('Is Authenticated:', req.isAuthenticated());
+  next();
+});
 
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
