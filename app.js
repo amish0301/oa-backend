@@ -38,14 +38,13 @@ app.use(
   })
 );
 
-// app.set("trust proxy", 1); may not be needed
+app.set("trust proxy", 1);
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 // passport initialize
 initializePassport(passport);
-
 
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
