@@ -13,18 +13,16 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 require("dotenv").config();
 
-connectDB(process.env.MONGO_URI);
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: process.env.CLIENT_URI,
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: process.env.CLIENT_URI,
+  credentials: true
+}))
+connectDB(process.env.MONGO_URI);
 
 const mongoStore = MongoStore.create({
   mongoUrl: process.env.MONGO_URI,

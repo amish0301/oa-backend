@@ -32,11 +32,15 @@ router.get(
 
 router.get("/login/success", async (req, res) => {
   try {
+    console.log("Session data:", req.session);
+    console.log("User data:", req.user);
+    console.log("Is authenticated:", req.isAuthenticated());
+
     if (req.isAuthenticated()) {
       console.log("User:", req.user);
       // const accessToken = await req.user.generateAccessToken();
       // const refreshToken = await req.user.generateRefreshToken();
-      const user = req.user
+      const user = req.user;
 
       // set cookies
       // res.cookie(process.env.AUTH_TOKEN, accessToken, cookieOption);
@@ -47,6 +51,11 @@ router.get("/login/success", async (req, res) => {
         success: true,
         message: "Login successfully",
         refreshToken,
+      });
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
       });
     }
   } catch (error) {
