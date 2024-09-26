@@ -22,7 +22,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: `${process.env.CLIENT_URI}/auth/login/failed`,
+    failureRedirect: `/auth/login/failed`,
   }),
   (req, res) => {
     res.redirect(`${process.env.CLIENT_URI}/auth/login/success`);
