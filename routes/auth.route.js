@@ -25,37 +25,35 @@ router.get(
     failureRedirect: `${process.env.CLIENT_URI}/auth/login/failed`,
   }),
   (req, res) => {
-    console.log("OAuth Callback User:", req.user);
     res.redirect(`${process.env.CLIENT_URI}/auth/login/success`);
   }
 );
 
 router.get("/login/success", async (req, res) => {
   try {
-    console.log("Login Success route");
-    console.log("Session data:", req.session);
-    console.log("User data:", req.user);
-    console.log("Is authenticated:", req.isAuthenticated());
-
     if (req.isAuthenticated()) {
-      console.log("User:", req.user);
-      // const accessToken = await req.user.generateAccessToken();
-      // const refreshToken = await req.user.generateRefreshToken();
-      const user = req.user;
+      const accessToken = await req.user.generateAccessToken();
+      const refreshToken = await req.user.generateRefreshToken();
+      console.log("accessToken", accessToken);
+      console.log("refreshToken", refreshToken);
+
+      const user = await User.findById(req.uId).select("-password");
+      console.log(user)
 
       // set cookies
-      // res.cookie(process.env.AUTH_TOKEN, accessToken, cookieOption);
-      // res.cookie("refreshToken", refreshToken, cookieOption);
+      res.cookie(process.env.AUTH_TOKEN, accessToken, cookieOption);
+      res.cookie("refreshToken", refreshToken, cookieOption);
 
       return res.status(200).json({
         user,
         success: true,
         message: "Login successfully",
+        refreshToken
       });
     } else {
       return res.status(401).json({
         success: false,
-        message: "User not authenticated",
+        message: "Google oAuth failed",
       });
     }
   } catch (error) {
